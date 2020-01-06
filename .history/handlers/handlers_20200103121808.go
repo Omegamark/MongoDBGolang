@@ -34,9 +34,11 @@ func AddToCollection(w http.ResponseWriter, r *http.Request) {
 		log.Println("handlers.go ln 33, failed to add gamer to database with error: ", err)
 	}
 
-	// log.Println(gamer)
-	// w.WriteHeader(200)
-	// w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	w.Header().Set("Content-Type", "application/json")
+
+	// fmt.Fprint(w, gamer)
+	log.Println(gamer)
 }
 
 // DeleteOneFromCollection removes one or more records from a collection.

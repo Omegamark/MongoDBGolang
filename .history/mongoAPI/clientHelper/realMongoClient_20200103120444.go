@@ -6,7 +6,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// RealClientHelper is a struct which contains the ACTUAL Mongo client for production purposes.
 type RealClientHelper struct {
 	Client *mongo.Client
 }
@@ -16,3 +15,20 @@ func (rc RealClientHelper) Collection(name string) (collectionhelper.ICollection
 	// TODO: Make the Database and Collection names dynamic, potentially use constants for a dropdown.
 	return rc.Client.Database("BR").Collection(name), nil
 }
+
+// func (rc RealClientHelper) NewClient() {
+// 	// TODO : Make the URI here configurable.
+// 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://localhost:27017"))
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+
+// 	err = client.Ping(context.TODO(), nil)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+
+// 	fmt.Println("Connected to MongoDB!")
+
+// 	return client
+// }

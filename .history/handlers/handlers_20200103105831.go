@@ -5,6 +5,7 @@ import (
 	mongoapi "MongoDBGolang/mongoAPI"
 	databasehelper "MongoDBGolang/mongoAPI/databaseHelper"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -16,27 +17,29 @@ func AddToCollection(w http.ResponseWriter, r *http.Request) {
 	var gamer models.Gamer
 	err := json.NewDecoder(r.Body).Decode(&gamer)
 	if err != nil {
-		log.Println("Failed to read request Body: ", err)
+		fmt.Println("Failed to read request Body: ", err)
 	}
 
 	var realDB databasehelper.IDatabaseHelper = &databasehelper.RealDatabaseHelper{}
 
 	client, err := realDB.NewClient("mongodb://localhost:27017")
 	if err != nil {
-		log.Println("I'm an error 1")
+		fmt.Println("I'm an error 1")
 	}
 	collection, err := client.Collection("Gamers")
 	if err != nil {
-		log.Println("I'm an error 2")
+		fmt.Println("I'm an error 2")
 	}
 	err = mongoapi.AddToGamerCollection(collection, gamer)
 	if err != nil {
-		log.Println("handlers.go ln 33, failed to add gamer to database with error: ", err)
+		fmt.Println("handlers.go ln 33, failed to add gamer to database with error: ", err)
 	}
 
-	// log.Println(gamer)
-	// w.WriteHeader(200)
-	// w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	w.Header().Set("Content-Type", "application/json")
+
+	// fmt.Fprint(w, gamer)
+	fmt.Println(gamer)
 }
 
 // DeleteOneFromCollection removes one or more records from a collection.
@@ -46,7 +49,7 @@ func DeleteOneFromCollection(w http.ResponseWriter, r *http.Request) {
 	bodyJSON := make(map[string]interface{})
 	err := json.NewDecoder(r.Body).Decode(&bodyJSON)
 	if err != nil {
-		log.Println("Failed to read request Body: ", err)
+		fmt.Println("Failed to read request Body: ", err)
 	}
 
 	client, err := realDB.NewClient("mongodb://localhost:27017")
@@ -82,22 +85,15 @@ func FindOneInCollection(w http.ResponseWriter, r *http.Request) {
 	bodyJSON := make(map[string]interface{})
 	err = json.NewDecoder(r.Body).Decode(&bodyJSON)
 	if err != nil {
-		log.Println("Failed to read request Body: ", err)
+		fmt.Println("Failed to read request Body: ", err)
 	}
 
 	name := bodyJSON["name"]
 	opts := bodyJSON["opts"]
 
-	gamer, _ := mongoapi.FindOneInCollection(collection, name, opts.([]interface{}))
-
-	response, err := json.Marshal(gamer)
-	if err != nil {
-		log.Println("Failed to marshall json. ", err)
-	}
-
 	w.WriteHeader(200)
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(response)
+	mongoapi.FindOneInCollection(collection, name, opts.([]interface{}))
 }
 
 // UpdateGamer is a handler which updates the info of one gamer by name.
@@ -125,30 +121,18 @@ func UpdateGamer(w http.ResponseWriter, r *http.Request) {
 	// Make this into a field and value to update.
 	infoToUpdate := bodyJSON["age"]
 
-	log.Println(bodyJSON)
+	fmt.Println(bodyJSON)
 	mongoapi.UpdateOneGamerByName(collection, name, infoToUpdate)
 }
 
-// UpdateGamerGamelist adds a game to a gamer's gamelist.
-func UpdateGamerGamelist(w http.ResponseWriter, r *http.Request) {
-	var realDB databasehelper.IDatabaseHelper = &databasehelper.RealDatabaseHelper{}
+// // UpdateGamerGamelist adds a game to a gamer's gamelist.
+// func UpdateGamerGamelist(w http.ResponseWriter, r *http.Request) {
+// 	var gamerUpdate models.GamelistUpdate
 
-	client, err := realDB.NewClient("mongodb://localhost:27017")
-	if err != nil {
-		log.Printf("Failed to initialize a client: %s", err)
-	}
+// 	err := json.NewDecoder(r.Body).Decode(&gamerUpdate)
+// 	if err != nil {
+// 		fmt.Println("Failed to read request Body: ", err)
+// 	}
 
-	collection, err := client.Collection("Gamers")
-	if err != nil {
-		log.Printf("Failed to initialize Mongo collection: %s", err)
-	}
-
-	var gamerUpdate models.GamelistUpdate
-
-	err = json.NewDecoder(r.Body).Decode(&gamerUpdate)
-	if err != nil {
-		log.Println("Failed to read request Body: ", err)
-	}
-
-	mongoapi.AddGameToGamerGamelist(collection, gamerUpdate)
-}
+// 	mongoapi.AddGameToGamerGamelist("BR", "Gamers", gamerUpdate)
+// }

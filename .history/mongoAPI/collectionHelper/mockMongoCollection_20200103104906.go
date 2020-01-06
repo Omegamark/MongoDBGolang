@@ -43,18 +43,7 @@ func (dd MockCollectionHelper) FindOne(ctx context.Context, data interface{}, op
 	return &mongo.SingleResult{}
 }
 
-func (dd MockCollectionHelper) UpdateOne(ctx context.Context, filter interface{}, update interface{}, opts ...*options.UpdateOptions) (*mongo.UpdateResult, error) {
+func (dd MockCollectionHelper) UpdateOne(ctx context.Context, filter interface{}, update interface{}, opts ...*options.UpdateOptions) (*UpdateResult, error) {
 	dd.data = append(dd.data, update)
-	fmt.Println("*****************")
-	fmt.Println("UPDATE: ", update)
-	fmt.Println("FILTER: ", filter)
-	fmt.Println("*****************")
-
-	var err error
-	if update == nil {
-		err = errors.New("Failed to update")
-		return &mongo.UpdateResult{}, err
-	}
-
 	return &mongo.UpdateResult{}, nil
 }

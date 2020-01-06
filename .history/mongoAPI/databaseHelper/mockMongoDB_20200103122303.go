@@ -6,7 +6,6 @@ import clienthelper "MongoDBGolang/mongoAPI/clientHelper"
 type MockDatabaseHelper struct {
 }
 
-// NewClient here mocks the behavior of MongoDB's NewClient method, but returns a fake client.
 func (dd MockDatabaseHelper) NewClient(uri string) (clienthelper.IClientHelper, error) {
 	return clienthelper.MockClientHelper{}, nil
 }

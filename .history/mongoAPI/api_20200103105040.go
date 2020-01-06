@@ -13,11 +13,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// TODO: Move these to MAIN and create a layer called app, which then references the various packages.
-
+// Move these to MAIN and create a layer called app, which then references the various packages.
 // Consider using Viper to get these things.
-// const DATABASE = "BR"
-// const COLLECTION = "Gamers"
+const DATABASE = "BR"
+const COLLECTION = "Gamers"
 
 // type DataAccess interface {
 // 	Connect(ctx context.Context, opts ...*options.ClientOptions) (*mongo.Client, error)
@@ -57,6 +56,7 @@ import (
 */
 
 // AddToGamerCollection adds a new gamer to the database. You may add an arbitrary number of gamers.
+// func AddToGamerCollection(collection *mongo.Collection, gamer ...interface{}) error {
 func AddToGamerCollection(collection collectionhelper.ICollectionHelper, gamer ...interface{}) error {
 	// TODO: Make the clientDB into an interface so these methods could be used with any DB.
 	if gamer[0] == nil {
@@ -84,87 +84,76 @@ func AddToGamerCollection(collection collectionhelper.ICollectionHelper, gamer .
 
 // FindOneInCollection returns a gamer containing the fields
 func FindOneInCollection(collection collectionhelper.ICollectionHelper, gamerName interface{}, projections []interface{}) (models.Gamer, error) {
+	// var mc RealMongoClient
+	// collection := mc.MongoClient().Database(DATABASE).Collection(COLLECTION)
 	if gamerName == nil {
 		return models.Gamer{}, errors.New("Must enter a gamer name")
 	}
-
 	var result models.Gamer
-
-	// TODO: Make filters build more dynamically.
 	filter := bson.M{
 		"name": gamerName,
 	}
-
 	projectionOpts := bson.M{}
 	for _, key := range projections {
 		projectionOpts[key.(string)] = 1
 	}
 
-	err := collection.FindOne(context.TODO(), filter, options.FindOne().SetProjection(projectionOpts)).Decode(&result)
-	if err != nil {
-		log.Println("I'm a single result:", err)
-	}
+	sr := collection.FindOne(context.TODO(), filter, options.FindOne().SetProjection(projectionOpts)).Decode(&result)
 	fmt.Println("\n\nI'm the Result!\n\n", result)
+	fmt.Println("I'm a single result:", sr)
 	return result, nil
 }
 
-/*
+// /*
 
-	UPDATE
+// 	UPDATE
 
-*/
+// */
 
 // UpdateOneGamerByName allows the gamers name and age to be changed.
 func UpdateOneGamerByName(collection collectionhelper.ICollectionHelper, gamerName string, updateInfo interface{}) error {
+	// var mc RealMongoClient
+	// collection := mc.MongoClient().Database(databaseName).Collection(collectionName)
+
 	if gamerName == "" {
 		return errors.New("Must enter a gamer name")
 	}
-
-	if updateInfo == nil {
-		return errors.New("Must enter update information")
-	}
-
 	filter := bson.M{
 		"name": gamerName,
 	}
-
 	update := bson.M{
 		"$set": bson.M{
 			"age": updateInfo,
 		},
 	}
-
 	updateResult, err := collection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
-		return err
+		log.Println("Failed to update: ", err)
 	}
 
 	log.Printf("Matched %v document and updated %v document.\n", updateResult.MatchedCount, updateResult.ModifiedCount)
-	return nil
 }
 
-// AddGameToGamerGamelist adds a game to a gamer's game list.
-func AddGameToGamerGamelist(collection collectionhelper.ICollectionHelper, listUpdate models.GamelistUpdate) error {
-	// TODO: Make filter and update more dynamic
-	filter := bson.M{
-		"name": listUpdate.Name,
-	}
+// // AddGameToGamerGamelist adds a game to a gamer's game list.
+// func AddGameToGamerGamelist(databaseName string, collectionName string, listUpdate models.GamelistUpdate) {
+// 	var mc RealMongoClient
 
-	log.Println("List Update: ", listUpdate)
+// 	collection := mc.MongoClient().Database(databaseName).Collection(collectionName)
+// 	filter := bson.M{
+// 		"name": listUpdate.Name,
+// 	}
+// 	fmt.Println("List Update: ", listUpdate)
+// 	update := bson.M{
+// 		"$push": bson.M{
+// 			"gamelist": listUpdate.Game,
+// 		},
+// 	}
 
-	update := bson.M{
-		"$push": bson.M{
-			"gamelist": listUpdate.Game,
-		},
-	}
-
-	_, err := collection.UpdateOne(context.TODO(), filter, update)
-	if err != nil {
-		fmt.Println("Failed to update: ", err)
-		return err
-	}
-	return nil
-}
+// 	_, err := collection.UpdateOne(context.TODO(), filter, update)
+// 	if err != nil {
+// 		fmt.Println("Failed to update: ", err)
+// 	}
+// }
 
 /*
 

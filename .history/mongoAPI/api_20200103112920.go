@@ -13,11 +13,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// TODO: Move these to MAIN and create a layer called app, which then references the various packages.
-
+// Move these to MAIN and create a layer called app, which then references the various packages.
 // Consider using Viper to get these things.
-// const DATABASE = "BR"
-// const COLLECTION = "Gamers"
+const DATABASE = "BR"
+const COLLECTION = "Gamers"
 
 // type DataAccess interface {
 // 	Connect(ctx context.Context, opts ...*options.ClientOptions) (*mongo.Client, error)
@@ -144,14 +143,14 @@ func UpdateOneGamerByName(collection collectionhelper.ICollectionHelper, gamerNa
 }
 
 // AddGameToGamerGamelist adds a game to a gamer's game list.
-func AddGameToGamerGamelist(collection collectionhelper.ICollectionHelper, listUpdate models.GamelistUpdate) error {
-	// TODO: Make filter and update more dynamic
+func AddGameToGamerGamelist(databaseName string, collectionName string, listUpdate models.GamelistUpdate) {
+	var mc RealMongoClient
+
+	collection := mc.MongoClient().Database(databaseName).Collection(collectionName)
 	filter := bson.M{
 		"name": listUpdate.Name,
 	}
-
-	log.Println("List Update: ", listUpdate)
-
+	fmt.Println("List Update: ", listUpdate)
 	update := bson.M{
 		"$push": bson.M{
 			"gamelist": listUpdate.Game,
@@ -161,9 +160,7 @@ func AddGameToGamerGamelist(collection collectionhelper.ICollectionHelper, listU
 	_, err := collection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		fmt.Println("Failed to update: ", err)
-		return err
 	}
-	return nil
 }
 
 /*

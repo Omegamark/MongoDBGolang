@@ -8,6 +8,37 @@ import (
 	"testing"
 )
 
+// func TestMongoClientSuccess(t *testing.T) {
+// 	// var client *mongo.Client = &mongo.Client{}
+// 	var db mongoapi.DataAccess = mongoapi.FakeMongoClient{}
+// 	client, _ := db.Connect(context.TODO(), nil)
+// 	// fmt.Println("I'm a test!: ", reflect.TypeOf(client))
+// 	// Use () parens to encapsulate an initialized type.
+// 	if client == (&mongo.Client{}) {
+// 		t.Errorf("Failed to return a mongo client:\n\t Wanted: *mongo.Client\n\n \tGot: %v", reflect.TypeOf(client))
+// 	}
+
+// }
+
+// func TestMongoClientFailure(t *testing.T) {
+// 	// This test does not actuall fail.
+// 	client := mongoapi.MongoClient()
+// 	if client != (&mongo.Client{}) {
+// 		t.Log("Derrrrrr")
+// 		// t.Error("Client is not a string")
+// 	}
+// }
+
+// func TestAddGamerToCollection(t *testing.T) {
+// 	client, err := mongoapi.NewFakeClient()
+// 	if err != nil {
+// 		t.Error("Failed to initialize mock mongo")
+// 	}
+
+// 	fakeCollection := client.Database("BR").Collection("Gamers")
+
+// }
+
 func TestAddToGamerCollectionSuccess(t *testing.T) {
 	var games1 = []models.Game{{"Megaman", "Platformer", "NES"}, {"Daggerfall", "CRPG", "PC"}, {"Zelda64", "Adventure", "N64"}}
 	var gamer1 = models.Gamer{
@@ -114,28 +145,6 @@ func TestUpdateOneGamerByNameFail(t *testing.T) {
 	collection, _ := fakeClient.Collection("I'm a fake collection yo!")
 
 	err := mongoapi.UpdateOneGamerByName(collection, "Bebop", nil)
-	if err == nil {
-		t.Errorf("Test Failed: %v", err)
-	}
-}
-
-func TestAddGameToGamerGamelistSuccess(t *testing.T) {
-	var fakeDB databasehelper.IDatabaseHelper = databasehelper.MockDatabaseHelper{}
-
-	fakeClient, _ := fakeDB.NewClient("I'm a fake client mang!")
-
-	collection, _ := fakeClient.Collection("I'm a fake collection yo!")
-
-	update := models.GamelistUpdate{
-		Name: "Rocksteady",
-		Game: models.Game{
-			Name:     "Doesn't matter",
-			Genre:    "Fantastical",
-			Platform: "Amiga CD32",
-		},
-	}
-
-	err := mongoapi.AddGameToGamerGamelist(collection, update)
 	if err != nil {
 		t.Errorf("Test Failed: %v", err)
 	}

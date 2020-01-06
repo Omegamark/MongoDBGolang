@@ -34,9 +34,11 @@ func AddToCollection(w http.ResponseWriter, r *http.Request) {
 		log.Println("handlers.go ln 33, failed to add gamer to database with error: ", err)
 	}
 
-	// log.Println(gamer)
-	// w.WriteHeader(200)
-	// w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	w.Header().Set("Content-Type", "application/json")
+
+	// fmt.Fprint(w, gamer)
+	log.Println(gamer)
 }
 
 // DeleteOneFromCollection removes one or more records from a collection.
@@ -88,6 +90,9 @@ func FindOneInCollection(w http.ResponseWriter, r *http.Request) {
 	name := bodyJSON["name"]
 	opts := bodyJSON["opts"]
 
+	w.WriteHeader(200)
+	w.Header().Set("Content-Type", "application/json")
+
 	gamer, _ := mongoapi.FindOneInCollection(collection, name, opts.([]interface{}))
 
 	response, err := json.Marshal(gamer)
@@ -95,9 +100,6 @@ func FindOneInCollection(w http.ResponseWriter, r *http.Request) {
 		log.Println("Failed to marshall json. ", err)
 	}
 
-	w.WriteHeader(200)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(response)
 }
 
 // UpdateGamer is a handler which updates the info of one gamer by name.

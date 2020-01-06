@@ -13,7 +13,6 @@ import (
 type RealDatabaseHelper struct {
 }
 
-// NewClient here returns a real instance of a MongoDB Client.
 func (dd RealDatabaseHelper) NewClient(uri string) (clienthelper.IClientHelper, error) {
 	var clientHelper clienthelper.RealClientHelper = clienthelper.RealClientHelper{}
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))

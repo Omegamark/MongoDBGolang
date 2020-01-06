@@ -12,5 +12,5 @@ type ICollectionHelper interface {
 	InsertMany(context.Context, []interface{}, ...*options.InsertManyOptions) (*mongo.InsertManyResult, error)
 	DeleteOne(context.Context, interface{}, ...*options.DeleteOptions) (*mongo.DeleteResult, error)
 	FindOne(context.Context, interface{}, ...*options.FindOneOptions) *mongo.SingleResult
-	UpdateOne(context.Context, interface{}, interface{}, ...*options.UpdateOptions) (*mongo.UpdateResult, error)
+	UpdateOne(context.Context, interface{}, interface{}, ...*options.UpdateOptions) (*UpdateResult, error)
 }

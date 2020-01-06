@@ -13,8 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// TODO: Move these to MAIN and create a layer called app, which then references the various packages.
-
+// Move these to MAIN and create a layer called app, which then references the various packages.
 // Consider using Viper to get these things.
 // const DATABASE = "BR"
 // const COLLECTION = "Gamers"

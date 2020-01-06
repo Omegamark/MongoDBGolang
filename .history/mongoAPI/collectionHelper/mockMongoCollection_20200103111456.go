@@ -47,7 +47,6 @@ func (dd MockCollectionHelper) UpdateOne(ctx context.Context, filter interface{}
 	dd.data = append(dd.data, update)
 	fmt.Println("*****************")
 	fmt.Println("UPDATE: ", update)
-	fmt.Println("FILTER: ", filter)
 	fmt.Println("*****************")
 
 	var err error
