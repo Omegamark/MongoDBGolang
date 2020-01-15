@@ -1,0 +1,3 @@
+title = "packager-db-manager configuration"
+
+mongo_address = ""

@@ -1,52 +1,51 @@
-// package mongoapi
+package mongoapiredux
 
-// import (
-// 	"MongoDBGolang/models"
-// 	collectionhelper "MongoDBGolang/mongoAPI/collectionHelper"
-// 	"context"
-// 	"errors"
-// 	"fmt"
-// 	"log"
+import (
+	"context"
+	"errors"
+)
 
-// 	"go.mongodb.org/mongo-driver/bson"
-// 	"go.mongodb.org/mongo-driver/mongo"
-// 	"go.mongodb.org/mongo-driver/mongo/options"
-// )
+type MongoDatabase struct {
+	DBConnection MongoConnection
+}
 
-// /*
+/*
 
-// 	CREATE
+	CREATE
 
-// */
+*/
 
-// // AddToGamerCollection adds a new gamer to the database. You may add an arbitrary number of gamers.
-// func AddToGamerCollection(collection collectionhelper.ICollectionHelper, gamer ...interface{}) error {
-// 	// TODO: Make the clientDB into an interface so these methods could be used with any DB.
-// 	if gamer[0] == nil {
-// 		return errors.New("Nothing to add to DB")
-// 	}
-// 	if len(gamer) > 1 {
-// 		_, err := collection.InsertMany(context.TODO(), gamer)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		return nil
-// 	}
-// 	_, err := collection.InsertOne(context.TODO(), gamer[0])
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return nil
-// }
+// AddToGamerCollection adds a new gamer to the database. You may add an arbitrary number of gamers.
+func (db *MongoDatabase) AddToGamerCollection(gamer ...interface{}) error {
+	collection, err := db.DBConnection.GetCollection()
+	if err != nil {
+		return err
+	}
+	if gamer[0] == nil {
+		return errors.New("Nothing to add to DB")
+	}
+	if len(gamer) > 1 {
+		_, err := collection.InsertMany(context.TODO(), gamer)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	_, err = collection.InsertOne(context.TODO(), gamer[0])
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
-// /*
+/*
 
-// 	READ
+	READ
 
-// */
+*/
 
 // // FindOneInCollection returns a gamer containing the fields
-// func FindOneInCollection(collection collectionhelper.ICollectionHelper, gamerName interface{}, projections []interface{}) (models.Gamer, error) {
+// func (db *MongoDatabase) FindOneInCollection(collection collectionhelper.ICollectionHelper, gamerName interface{}, projections []interface{}) (models.Gamer, error) {
 // 	if gamerName == nil {
 // 		return models.Gamer{}, errors.New("Must enter a gamer name")
 // 	}
@@ -78,7 +77,7 @@
 // */
 
 // // UpdateOneGamerByName allows the gamers name and age to be changed.
-// func UpdateOneGamerByName(collection collectionhelper.ICollectionHelper, gamerName string, updateInfo interface{}) error {
+// func (db *MongoDatabase) UpdateOneGamerByName(collection collectionhelper.ICollectionHelper, gamerName string, updateInfo interface{}) error {
 // 	if gamerName == "" {
 // 		return errors.New("Must enter a gamer name")
 // 	}
@@ -107,7 +106,7 @@
 // }
 
 // // AddGameToGamerGamelist adds a game to a gamer's game list.
-// func AddGameToGamerGamelist(collection collectionhelper.ICollectionHelper, listUpdate models.GamelistUpdate) error {
+// func (db *MongoDatabase) AddGameToGamerGamelist(collection collectionhelper.ICollectionHelper, listUpdate models.GamelistUpdate) error {
 // 	// TODO: Make filter and update more dynamic
 // 	filter := bson.M{
 // 		"name": listUpdate.Name,
@@ -136,7 +135,7 @@
 // */
 
 // // DeleteOneGamerFromCollectionByName deletes any gamers passed as arguments.
-// func DeleteOneGamerFromCollectionByName(collection collectionhelper.ICollectionHelper, gamerName interface{}) error {
+// func (db *MongoDatabase) DeleteOneGamerFromCollectionByName(collection collectionhelper.ICollectionHelper, gamerName interface{}) error {
 // 	var filter bson.M
 // 	if gamerName != nil {
 // 		filter = bson.M{
@@ -155,7 +154,7 @@
 // }
 
 // // DropCollection drops the passed collection from the database.
-// func DropCollection(collection *mongo.Collection) error {
+// func (db *MongoDatabase) DropCollection(collection *mongo.Collection) error {
 // 	err := collection.Drop(context.TODO())
 // 	if err != nil {
 // 		return err

@@ -1,0 +1,97 @@
+package modules_test
+
+import (
+	"errors"
+	"reflect"
+	"testing"
+
+	"bitbucket.org/realeyesmedia/bucket-watcher/src/modules"
+	"github.com/elastic/go-elasticsearch/v7"
+)
+
+type mockESClient struct {
+	elasticsearch.Client
+	err error
+}
+
+type mockESInit struct {
+	init modules.ESInit
+	err  error
+}
+
+type mockESConfig struct {
+	modules.ESConfig
+	err error
+}
+
+var client, _ = elasticsearch.NewDefaultClient()
+
+var mockESClientSuccess = &modules.ESClient{
+	Client: *client,
+}
+
+var mockESInitSuccess = &mockESInit{}
+var mockESInitFail = &mockESInit{
+	err: errors.New("I'm an error!"),
+}
+
+var mockESConfigSuccess = &mockESConfig{}
+var mockESConfigFail = &mockESConfig{
+	err: errors.New("I'm an error!"),
+}
+
+func (m mockESInit) InitES() (modules.ESClient, error) {
+	if m.err != nil {
+		return modules.ESClient{}, m.err
+	}
+	return modules.ESClient{}, nil
+}
+
+var indexName = "testing_index_name"
+
+func TestPostToIndex(t *testing.T) {
+	sendJSON := []byte("\"testing\": \"Testing\"")
+	err := mockESClientSuccess.PostToIndex(sendJSON)
+	if err == nil {
+		t.Errorf("TestPostToIndex() failed: %v", err)
+	}
+}
+
+func TestMakeArrayForElasticSearch(t *testing.T) {
+	test := make(map[string]string)
+	result := mockESClientSuccess.MakeArrayForElasticSearch(test)
+	if reflect.TypeOf(result).String() != "[]string" {
+		t.Errorf("TestMakeArrayForElasticSearch() failed:\n\tWanted: []string\n\tGot: %v", result)
+	}
+}
+
+func TestInitializeES(t *testing.T) {
+	es, err := modules.InitializeES(mockESConfigSuccess)
+
+	if err != nil {
+		t.Errorf("TestInitializeCache() failed: %v", err)
+	}
+	if reflect.TypeOf(es).String() != "*modules.ESClient" {
+		t.Errorf("Result of InitializeCache() should be a *modules.ESClient: \n\t Want: *modules.ESClient\n\tGot: %v", es)
+	}
+
+	_, err = modules.InitializeCache(mockErrorCacheConfig)
+	if err != nil {
+		t.Errorf("TestInitializeCache() failed: %v", err)
+	}
+}
+
+func TestInitES(t *testing.T) {
+	client, err := mockESConfigSuccess.InitES()
+	if err != nil {
+		t.Errorf("TestInitES() failed: \n\tWant: <nil>\n\tGot: %v", err)
+	}
+	if reflect.TypeOf(client).String() != "*modules.ESClient" {
+		t.Errorf("Result of InitES() should be a *modules.ESClient: \n\t Want: *modules.ESClient\n\tGot: %v", client)
+	}
+
+	erredClient, err := mockESConfigFail.InitES()
+	if err != nil {
+		t.Errorf("TestInitES() failed: \n\tWant: <nil>\n\tGot: %v", *erredClient)
+	}
+}

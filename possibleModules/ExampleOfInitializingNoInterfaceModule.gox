@@ -1,0 +1,11 @@
+es, err := modules.InitializeES(&modules.ESConfig{
+		Addresses:    config.ESConfig.Addresses,
+		Username:     config.ESConfig.Username,
+		Password:     config.ESConfig.Password,
+		Transport:    config.ESConfig.Transport,
+		IndexName:    config.ESConfig.IndexName,
+		LogIndexName: config.ESConfig.LogIndexName,
+	})
+	if err != nil {
+		modules.L.Error.Println("Error initializing elastic search:", err)
+	}
