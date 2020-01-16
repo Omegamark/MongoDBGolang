@@ -36,5 +36,7 @@ func setConfig() *appconfig.Config {
 		Collection: viper.GetString("mongo_collection"),
 	}
 
+	config.Port = viper.GetString("port")
+
 	return &config
 }

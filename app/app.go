@@ -19,8 +19,10 @@ func StartUp(config *appconfig.Config) {
 		Collection: config.MongoCfg.Collection,
 	}}}
 
+	port := config.Port
+
 	router := handlers.InitRoutes(gamerHandler)
 
 	fmt.Println("Server is running")
-	log.Fatal(http.ListenAndServe("localhost:8080", router))
+	log.Fatal(http.ListenAndServe(port, router))
 }

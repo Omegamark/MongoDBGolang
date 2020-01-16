@@ -2,6 +2,7 @@ package appconfig
 
 // Config is a struct with commong variables for the app.
 type Config struct {
+	Port     string
 	MongoCfg *MongoConfig
 }
 
