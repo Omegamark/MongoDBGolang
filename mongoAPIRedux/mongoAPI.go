@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// MongoDatabase represents a connection to a mongo database
 type MongoDatabase struct {
 	DBConnection MongoConnection
 }
