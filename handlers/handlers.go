@@ -4,7 +4,6 @@ import (
 	"MongoDBGolang/models"
 	mongoapiredux "MongoDBGolang/mongoAPIRedux"
 	"encoding/json"
-	"log"
 	"net/http"
 )
 
@@ -46,48 +45,54 @@ func (c *MongoHandler) DeleteOneFromCollection(w http.ResponseWriter, r *http.Re
 	bodyJSON := make(map[string]interface{})
 	err := json.NewDecoder(r.Body).Decode(&bodyJSON)
 	if err != nil {
-		log.Println("Failed to read request Body: ", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	gamerName := bodyJSON["name"]
 
 	err = c.DB.DeleteOneGamerFromCollectionByName(gamerName)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 }
 
-// // FindOneInCollection returns a single gamer from the collection.
-// func FindOneInCollection(w http.ResponseWriter, r *http.Request) {
-// 	var realDB databasehelper.IDatabaseHelper = &databasehelper.RealDatabaseHelper{}
+// FindOneInCollection returns a single gamer from the collection.
+func (c *MongoHandler) FindOneInCollection(w http.ResponseWriter, r *http.Request) {
+	// var realDB databasehelper.IDatabaseHelper = &databasehelper.RealDatabaseHelper{}
+	defer r.Body.Close()
+	// client, err := realDB.NewClient("mongodb://localhost:27017")
+	// if err != nil {
+	// 	log.Printf("Failed to initialize a client: %s", err)
+	// }
 
-// 	client, err := realDB.NewClient("mongodb://localhost:27017")
-// 	if err != nil {
-// 		log.Printf("Failed to initialize a client: %s", err)
-// 	}
+	// collection, err := client.Collection("Gamers")
+	// if err != nil {
+	// 	log.Printf("Failed to initialize Mongo collection: %s", err)
+	// }
 
-// 	collection, err := client.Collection("Gamers")
-// 	if err != nil {
-// 		log.Printf("Failed to initialize Mongo collection: %s", err)
-// 	}
+	// NOTE: This is to show how to decode JSON if there is no struct to unmarshal into.
+	bodyJSON := make(map[string]interface{})
+	err := json.NewDecoder(r.Body).Decode(&bodyJSON)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-// 	bodyJSON := make(map[string]interface{})
-// 	err = json.NewDecoder(r.Body).Decode(&bodyJSON)
-// 	if err != nil {
-// 		log.Println("Failed to read request Body: ", err)
-// 	}
+	name := bodyJSON["name"]
+	opts := bodyJSON["opts"]
 
-// 	name := bodyJSON["name"]
-// 	opts := bodyJSON["opts"]
+	gamer, _ := c.DB.FindOneInCollection(name, opts.([]interface{}))
 
-// 	gamer, _ := mongoapi.FindOneInCollection(collection, name, opts.([]interface{}))
+	response, err := json.Marshal(gamer)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-// 	response, err := json.Marshal(gamer)
-// 	if err != nil {
-// 		log.Println("Failed to marshall json. ", err)
-// 	}
-
-// 	w.WriteHeader(200)
-// 	w.Header().Set("Content-Type", "application/json")
-// 	w.Write(response)
-// }
+	successResponseHelper(response, w)
+}
 
 // // UpdateGamer is a handler which updates the info of one gamer by name.
 // func UpdateGamer(w http.ResponseWriter, r *http.Request) {

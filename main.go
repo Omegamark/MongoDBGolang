@@ -8,13 +8,9 @@ import (
 )
 
 func main() {
-	// router := handlers.InitRoutes()
-
-	// fmt.Println("Server is running")
-	// log.Fatal(http.ListenAndServe("localhost:8080", router))
 	config := setConfig()
+	// TODO: Have StartUp return an error and shutdown the app.
 	app.StartUp(config)
-
 }
 
 // TODO: Consider setting a config and passing it down to the app.

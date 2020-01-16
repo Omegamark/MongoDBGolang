@@ -1,10 +1,12 @@
 package mongoapiredux
 
 import (
+	"MongoDBGolang/models"
 	"context"
 	"errors"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type MongoDatabase struct {
@@ -49,31 +51,33 @@ func (db *MongoDatabase) AddToGamerCollection(gamer ...interface{}) error {
 
 */
 
-// // FindOneInCollection returns a gamer containing the fields
-// func (db *MongoDatabase) FindOneInCollection(collection collectionhelper.ICollectionHelper, gamerName interface{}, projections []interface{}) (models.Gamer, error) {
-// 	if gamerName == nil {
-// 		return models.Gamer{}, errors.New("Must enter a gamer name")
-// 	}
+// FindOneInCollection returns a gamer containing the fields
+func (db *MongoDatabase) FindOneInCollection(gamerName interface{}, projections []interface{}) (*models.Gamer, error) {
+	collection, err := db.DBConnection.GetCollection()
 
-// 	var result models.Gamer
+	if gamerName == nil {
+		return nil, errors.New("Must enter a gamer name")
+	}
 
-// 	// TODO: Make filters build more dynamically.
-// 	filter := bson.M{
-// 		"name": gamerName,
-// 	}
+	var result models.Gamer
 
-// 	projectionOpts := bson.M{}
-// 	for _, key := range projections {
-// 		projectionOpts[key.(string)] = 1
-// 	}
+	// TODO: Make filters build more dynamically.
+	filter := bson.M{
+		"name": gamerName,
+	}
 
-// 	err := collection.FindOne(context.TODO(), filter, options.FindOne().SetProjection(projectionOpts)).Decode(&result)
-// 	if err != nil {
-// 		log.Println("I'm a single result:", err)
-// 	}
-// 	fmt.Println("\n\nI'm the Result!\n\n", result)
-// 	return result, nil
-// }
+	projectionOpts := bson.M{}
+	for _, key := range projections {
+		projectionOpts[key.(string)] = 1
+	}
+
+	err = collection.FindOne(context.TODO(), filter, options.FindOne().SetProjection(projectionOpts)).Decode(&result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
 
 // /*
 
