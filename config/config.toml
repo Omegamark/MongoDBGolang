@@ -1,3 +1,5 @@
 title = "packager-db-manager configuration"
 
-mongo_address = ""
+mongo_uri = "mongodb://localhost:27017"
+mongo_database = "BR"
+mongo_collection = "Gamers"

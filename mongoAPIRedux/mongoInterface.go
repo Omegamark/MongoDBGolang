@@ -6,6 +6,6 @@ type MongoInterface interface {
 	// FindOneInCollection(collection collectionhelper.ICollectionHelper, gamerName interface{}, projections []interface{}) (models.Gamer, error)
 	// UpdateOneGamerByName(collection collectionhelper.ICollectionHelper, gamerName string, updateInfo interface{}) error
 	// AddGameToGamerGamelist(collection collectionhelper.ICollectionHelper, listUpdate models.GamelistUpdate) error
-	// DeleteOneGamerFromCollectionByName(collection collectionhelper.ICollectionHelper, gamerName interface{}) error
+	DeleteOneGamerFromCollectionByName(gamerName interface{}) error
 	// DropCollection(collection *mongo.Collection) error
 }

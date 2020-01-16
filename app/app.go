@@ -1,16 +1,25 @@
 package app
 
 import (
+	appconfig "MongoDBGolang/config"
 	"MongoDBGolang/handlers"
+	mongoapiredux "MongoDBGolang/mongoAPIRedux"
 	"fmt"
 	"log"
 	"net/http"
 )
 
 // StartUp starts the app
-func StartUp() {
+func StartUp(config *appconfig.Config) {
 	// TODO: Have this return an error
-	router := handlers.InitRoutes()
+	// TODO: Consider moving the Mongo hanlder struct elsewhere. Actually reconsider this whole concept, it is confusing.
+	gamerHandler := &handlers.MongoHandler{DB: &mongoapiredux.MongoDatabase{DBConnection: mongoapiredux.MongoConnection{
+		URI:        config.MongoCfg.MongoURI,
+		Database:   config.MongoCfg.Database,
+		Collection: config.MongoCfg.Collection,
+	}}}
+
+	router := handlers.InitRoutes(gamerHandler)
 
 	fmt.Println("Server is running")
 	log.Fatal(http.ListenAndServe("localhost:8080", router))

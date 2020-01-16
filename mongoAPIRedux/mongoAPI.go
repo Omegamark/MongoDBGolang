@@ -3,6 +3,8 @@ package mongoapiredux
 import (
 	"context"
 	"errors"
+
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 type MongoDatabase struct {
@@ -15,15 +17,17 @@ type MongoDatabase struct {
 
 */
 
-// AddToGamerCollection adds a new gamer to the database. You may add an arbitrary number of gamers.
+// AddToGamerCollection adds one or many new gamer(s) to the database. You may add an arbitrary number of gamers.
 func (db *MongoDatabase) AddToGamerCollection(gamer ...interface{}) error {
 	collection, err := db.DBConnection.GetCollection()
 	if err != nil {
 		return err
 	}
+
 	if gamer[0] == nil {
 		return errors.New("Nothing to add to DB")
 	}
+
 	if len(gamer) > 1 {
 		_, err := collection.InsertMany(context.TODO(), gamer)
 		if err != nil {
@@ -31,6 +35,7 @@ func (db *MongoDatabase) AddToGamerCollection(gamer ...interface{}) error {
 		}
 		return nil
 	}
+
 	_, err = collection.InsertOne(context.TODO(), gamer[0])
 	if err != nil {
 		return err
@@ -128,30 +133,37 @@ func (db *MongoDatabase) AddToGamerCollection(gamer ...interface{}) error {
 // 	return nil
 // }
 
-// /*
+/*
 
-// 	DELETE
+	DELETE
 
-// */
+*/
 
-// // DeleteOneGamerFromCollectionByName deletes any gamers passed as arguments.
-// func (db *MongoDatabase) DeleteOneGamerFromCollectionByName(collection collectionhelper.ICollectionHelper, gamerName interface{}) error {
-// 	var filter bson.M
-// 	if gamerName != nil {
-// 		filter = bson.M{
-// 			"name": gamerName,
-// 		}
-// 	} else {
-// 		return errors.New("Name argument cannot be blank or <nil>")
-// 	}
+// DeleteOneGamerFromCollectionByName deletes any gamers passed as arguments.
+func (db *MongoDatabase) DeleteOneGamerFromCollectionByName(gamerName interface{}) error {
+	// TODO: Return a success response.
+	collection, err := db.DBConnection.GetCollection()
+	if err != nil {
+		return err
+	}
 
-// 	_, err := collection.DeleteOne(context.TODO(), filter)
-// 	if err != nil {
-// 		return err
-// 	}
+	var filter bson.M
 
-// 	return nil
-// }
+	if gamerName != nil {
+		filter = bson.M{
+			"name": gamerName,
+		}
+	} else {
+		return errors.New("Name argument cannot be blank or <nil>")
+	}
+
+	_, err = collection.DeleteOne(context.TODO(), filter)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 // // DropCollection drops the passed collection from the database.
 // func (db *MongoDatabase) DropCollection(collection *mongo.Collection) error {
