@@ -19,10 +19,8 @@ func StartUp(config *appconfig.Config) {
 		Collection: config.MongoCfg.Collection,
 	}}}
 
-	port := config.Port
-
 	router := handlers.InitRoutes(gamerHandler)
 
-	fmt.Println("Server is running")
-	log.Fatal(http.ListenAndServe(port, router))
+	fmt.Printf("Server is running at %v", config.Port)
+	log.Fatal(http.ListenAndServe(config.Port, router))
 }
