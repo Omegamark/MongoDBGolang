@@ -14,6 +14,7 @@ func main() {
 }
 
 // TODO: Consider setting a config and passing it down to the app.
+// TODO: Have setConfig return an error.
 // func setConfig() (*app.Config, error) {
 func setConfig() *appconfig.Config {
 	config := appconfig.Config{}

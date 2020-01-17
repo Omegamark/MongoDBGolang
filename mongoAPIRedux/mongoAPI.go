@@ -4,6 +4,8 @@ import (
 	"MongoDBGolang/models"
 	"context"
 	"errors"
+	"fmt"
+	"log"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -55,6 +57,9 @@ func (db *MongoDatabase) AddToGamerCollection(gamer ...interface{}) error {
 // FindOneInCollection returns a gamer containing the fields
 func (db *MongoDatabase) FindOneInCollection(gamerName interface{}, projections []interface{}) (*models.Gamer, error) {
 	collection, err := db.DBConnection.GetCollection()
+	if err != nil {
+		return nil, err
+	}
 
 	if gamerName == nil {
 		return nil, errors.New("Must enter a gamer name")
@@ -80,63 +85,72 @@ func (db *MongoDatabase) FindOneInCollection(gamerName interface{}, projections 
 	return &result, nil
 }
 
-// /*
+/*
 
-// 	UPDATE
+	UPDATE
 
-// */
+*/
 
-// // UpdateOneGamerByName allows the gamers name and age to be changed.
-// func (db *MongoDatabase) UpdateOneGamerByName(collection collectionhelper.ICollectionHelper, gamerName string, updateInfo interface{}) error {
-// 	if gamerName == "" {
-// 		return errors.New("Must enter a gamer name")
-// 	}
+// UpdateOneGamerByName allows the gamers name and age to be changed.
+func (db *MongoDatabase) UpdateOneGamerByName(gamerName string, updateInfo interface{}) error {
+	collection, err := db.DBConnection.GetCollection()
+	if err != nil {
+		return err
+	}
 
-// 	if updateInfo == nil {
-// 		return errors.New("Must enter update information")
-// 	}
+	if gamerName == "" {
+		return errors.New("Must enter a gamer name")
+	}
 
-// 	filter := bson.M{
-// 		"name": gamerName,
-// 	}
+	if updateInfo == nil {
+		return errors.New("Must enter update information")
+	}
 
-// 	update := bson.M{
-// 		"$set": bson.M{
-// 			"age": updateInfo,
-// 		},
-// 	}
+	filter := bson.M{
+		"name": gamerName,
+	}
 
-// 	updateResult, err := collection.UpdateOne(context.TODO(), filter, update)
-// 	if err != nil {
-// 		return err
-// 	}
+	update := bson.M{
+		"$set": bson.M{
+			"age": updateInfo,
+		},
+	}
 
-// 	log.Printf("Matched %v document and updated %v document.\n", updateResult.MatchedCount, updateResult.ModifiedCount)
-// 	return nil
-// }
+	updateResult, err := collection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		return err
+	}
 
-// // AddGameToGamerGamelist adds a game to a gamer's game list.
-// func (db *MongoDatabase) AddGameToGamerGamelist(collection collectionhelper.ICollectionHelper, listUpdate models.GamelistUpdate) error {
-// 	// TODO: Make filter and update more dynamic
-// 	filter := bson.M{
-// 		"name": listUpdate.Name,
-// 	}
+	log.Printf("Matched %v document and updated %v document.\n", updateResult.MatchedCount, updateResult.ModifiedCount)
+	return nil
+}
 
-// 	log.Println("List Update: ", listUpdate)
+// AddGameToGamerGamelist adds a game to a gamer's game list.
+func (db *MongoDatabase) AddGameToGamerGamelist(listUpdate models.GamelistUpdate) error {
+	// TODO: Make filter and update more dynamic
+	collection, err := db.DBConnection.GetCollection()
+	if err != nil {
+		return err
+	}
 
-// 	update := bson.M{
-// 		"$push": bson.M{
-// 			"gamelist": listUpdate.Game,
-// 		},
-// 	}
+	// NOTE: Update this to make fields dynamic.
+	filter := bson.M{
+		"name": listUpdate.Name,
+	}
 
-// 	_, err := collection.UpdateOne(context.TODO(), filter, update)
-// 	if err != nil {
-// 		fmt.Println("Failed to update: ", err)
-// 		return err
-// 	}
-// 	return nil
-// }
+	update := bson.M{
+		"$push": bson.M{
+			"gamelist": listUpdate.Game,
+		},
+	}
+
+	_, err = collection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		fmt.Println("Failed to update: ", err)
+		return err
+	}
+	return nil
+}
 
 /*
 

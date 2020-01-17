@@ -10,8 +10,8 @@ func InitRoutes(gamerHandler *MongoHandler) *mux.Router {
 
 	r.HandleFunc("/addGamer", gamerHandler.AddToCollection).Methods("POST")
 	r.HandleFunc("/findGamer", gamerHandler.FindOneInCollection).Methods("GET")
-	// r.HandleFunc("/updateGamer", UpdateGamer).Methods("PUT")
-	// r.HandleFunc("/addGameToList", UpdateGamerGamelist).Methods("PUT")
+	r.HandleFunc("/updateGamer", gamerHandler.UpdateGamer).Methods("PUT")
+	r.HandleFunc("/addGameToList", gamerHandler.UpdateGamerGamelist).Methods("PUT")
 	r.HandleFunc("/deleteGamer", gamerHandler.DeleteOneFromCollection).Methods("DELETE")
 
 	return r

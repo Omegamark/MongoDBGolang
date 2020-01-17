@@ -6,8 +6,8 @@ import "MongoDBGolang/models"
 type MongoInterface interface {
 	AddToGamerCollection(gamer ...interface{}) error
 	FindOneInCollection(gamerName interface{}, projections []interface{}) (*models.Gamer, error)
-	// UpdateOneGamerByName(collection collectionhelper.ICollectionHelper, gamerName string, updateInfo interface{}) error
-	// AddGameToGamerGamelist(collection collectionhelper.ICollectionHelper, listUpdate models.GamelistUpdate) error
+	UpdateOneGamerByName(gamerName string, updateInfo interface{}) error
+	AddGameToGamerGamelist(listUpdate models.GamelistUpdate) error
 	DeleteOneGamerFromCollectionByName(gamerName interface{}) error
 	// DropCollection(collection *mongo.Collection) error
 }

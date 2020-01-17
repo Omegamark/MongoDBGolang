@@ -4,6 +4,7 @@ import (
 	"MongoDBGolang/models"
 	mongoapiredux "MongoDBGolang/mongoAPIRedux"
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -42,6 +43,7 @@ func (c *MongoHandler) DeleteOneFromCollection(w http.ResponseWriter, r *http.Re
 	// NOTE: This is how one can decode JSON with an unknown shape into go. It is difficult to work with and will really only show a reproduction of the JSON object.
 	// However some rudamentory operations can be done with it as demonstrated below.
 	defer r.Body.Close()
+
 	bodyJSON := make(map[string]interface{})
 	err := json.NewDecoder(r.Body).Decode(&bodyJSON)
 	if err != nil {
@@ -60,17 +62,7 @@ func (c *MongoHandler) DeleteOneFromCollection(w http.ResponseWriter, r *http.Re
 
 // FindOneInCollection returns a single gamer from the collection.
 func (c *MongoHandler) FindOneInCollection(w http.ResponseWriter, r *http.Request) {
-	// var realDB databasehelper.IDatabaseHelper = &databasehelper.RealDatabaseHelper{}
 	defer r.Body.Close()
-	// client, err := realDB.NewClient("mongodb://localhost:27017")
-	// if err != nil {
-	// 	log.Printf("Failed to initialize a client: %s", err)
-	// }
-
-	// collection, err := client.Collection("Gamers")
-	// if err != nil {
-	// 	log.Printf("Failed to initialize Mongo collection: %s", err)
-	// }
 
 	// NOTE: This is to show how to decode JSON if there is no struct to unmarshal into.
 	bodyJSON := make(map[string]interface{})
@@ -94,58 +86,40 @@ func (c *MongoHandler) FindOneInCollection(w http.ResponseWriter, r *http.Reques
 	successResponseHelper(response, w)
 }
 
-// // UpdateGamer is a handler which updates the info of one gamer by name.
-// func UpdateGamer(w http.ResponseWriter, r *http.Request) {
-// 	var realDB databasehelper.IDatabaseHelper = &databasehelper.RealDatabaseHelper{}
+// UpdateGamer is a handler which updates the info of one gamer by name.
+func (c *MongoHandler) UpdateGamer(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
 
-// 	client, err := realDB.NewClient("mongodb://localhost:27017")
-// 	if err != nil {
-// 		log.Printf("Failed to initialize a client: %s", err)
-// 	}
+	bodyJSON := make(map[string]interface{})
+	err := json.NewDecoder(r.Body).Decode(&bodyJSON)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-// 	collection, err := client.Collection("Gamers")
-// 	if err != nil {
-// 		log.Printf("Failed to initialize Mongo collection: %s", err)
-// 	}
+	// NOTE: Asserting that this JSON value is a string.
+	// NOTE: If unmarshalling into a struct, these kinds of tricks are unnecessary.
+	name := bodyJSON["name"].(string)
+	// NOTE: Make this into a field and value to update.
+	infoToUpdate := bodyJSON["age"]
 
-// 	bodyJSON := make(map[string]interface{})
-// 	err = json.NewDecoder(r.Body).Decode(&bodyJSON)
-// 	if err != nil {
-// 		log.Println("Failed to read request Body: ", err)
-// 	}
+	c.DB.UpdateOneGamerByName(name, infoToUpdate)
+}
 
-// 	// Asserting that this JSON value is a string.
-// 	name := bodyJSON["name"].(string)
-// 	// Make this into a field and value to update.
-// 	infoToUpdate := bodyJSON["age"]
+// UpdateGamerGamelist adds a game to a gamer's gamelist.
+func (c *MongoHandler) UpdateGamerGamelist(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
 
-// 	log.Println(bodyJSON)
-// 	mongoapi.UpdateOneGamerByName(collection, name, infoToUpdate)
-// }
+	// Having this extra type is unnecessary. The Gamer type would work just as well for this update.
+	var gamerUpdate models.GamelistUpdate
 
-// // UpdateGamerGamelist adds a game to a gamer's gamelist.
-// func UpdateGamerGamelist(w http.ResponseWriter, r *http.Request) {
-// 	var realDB databasehelper.IDatabaseHelper = &databasehelper.RealDatabaseHelper{}
+	err := json.NewDecoder(r.Body).Decode(&gamerUpdate)
+	if err != nil {
+		log.Println("Failed to read request Body: ", err)
+	}
 
-// 	client, err := realDB.NewClient("mongodb://localhost:27017")
-// 	if err != nil {
-// 		log.Printf("Failed to initialize a client: %s", err)
-// 	}
-
-// 	collection, err := client.Collection("Gamers")
-// 	if err != nil {
-// 		log.Printf("Failed to initialize Mongo collection: %s", err)
-// 	}
-
-// 	var gamerUpdate models.GamelistUpdate
-
-// 	err = json.NewDecoder(r.Body).Decode(&gamerUpdate)
-// 	if err != nil {
-// 		log.Println("Failed to read request Body: ", err)
-// 	}
-
-// 	mongoapi.AddGameToGamerGamelist(collection, gamerUpdate)
-// }
+	c.DB.AddGameToGamerGamelist(gamerUpdate)
+}
 
 // NOTE: Helper functions
 func successResponseHelper(responseBytes []byte, w http.ResponseWriter) {
